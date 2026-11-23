@@ -1,0 +1,5 @@
+[[rules]]
+id = "lab-example-aws-key"
+description = "Detect the planted AWS example key"
+regex = '''AKIAIOSFODNN7EXAMPLE'''
+tags = ["secret", "lab"]
