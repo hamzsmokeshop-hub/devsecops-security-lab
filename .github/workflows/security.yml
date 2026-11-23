@@ -34,4 +34,4 @@ jobs:
         run: |
           docker run --rm -v "${{ github.workspace }}:/repo" \
             aquasec/trivy:0.58.2 \
-            fs --scanners vuln --exit-code 0 /repo
+            fs --scanners vuln --exit-code 1 /repo
