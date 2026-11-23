@@ -1,0 +1,37 @@
+
+name: Security Scans
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d # v4.3.1
+        with:
+          fetch-depth: 0
+
+      - name: Secret scan (Gitleaks) - GATE
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/repo" \
+            ghcr.io/gitleaks/gitleaks:v8.24.3 \
+            git --source /repo --exit-code 1 --redact
+
+      - name: SAST (Semgrep) - REPORT
+        run: |
+          python -m pip install semgrep
+          semgrep scan --config p/python --config p/security-audit --json --output semgrep-results.json || true
+          python -c "import json; d=json.load(open('semgrep-results.json')); print('Semgrep findings:',len(d.get('results',[])))"
+
+      - name: Dependency scan (Trivy) - REPORT
+        if: always()
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/repo" \
+            aquasec/trivy:0.58.2 \
+            fs --scanners vuln --exit-code 0 /repo
