@@ -21,7 +21,7 @@ jobs:
         run: |
           docker run --rm -v "${{ github.workspace }}:/repo" \
             ghcr.io/gitleaks/gitleaks:v8.24.3 \
-            git --source /repo --exit-code 1 --redact
+            detect --source /repo --exit-code 1 --redact
 
       - name: SAST (Semgrep) - REPORT
         run: |
